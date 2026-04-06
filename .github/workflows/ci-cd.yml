@@ -39,7 +39,7 @@ jobs:
         run: uv sync --frozen
 
       - name: Run flake8
-        run: uv run flake8 .
+        run: uv run flake8 . --exclude=.venv
 
       - name: Run tests
         env:
