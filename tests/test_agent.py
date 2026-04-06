@@ -1,13 +1,16 @@
 import pytest
-import asyncio
+
 
 class DummyAgent:
     async def run(self, user_prompt):
         class Response:
             output = "Test response"
+
             def new_messages(self):
                 return []
+
         return Response()
+
 
 @pytest.mark.asyncio
 async def test_agent_run():

@@ -1,9 +1,5 @@
 def test_stream_delta_logic():
-    chunks = [
-        "Hello",
-        "Hello world",
-        "Hello world again"
-    ]
+    chunks = ["Hello", "Hello world", "Hello world again"]
 
     last_len = 0
     outputs = []

@@ -1,0 +1,15 @@
+{
+  "agent_name": "test_agent",
+  "system_prompt": "test instructions",
+  "provider": "test_system",
+  "model": "test_model",
+  "tools": [],
+  "messages": [
+    {
+      "role": "user",
+      "content": "hi",
+      "timestamp": "2026-04-06T14:45:28.679223"
+    }
+  ],
+  "source": "user"
+}

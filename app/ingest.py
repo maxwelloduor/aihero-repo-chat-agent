@@ -7,7 +7,7 @@ from minsearch import Index
 
 
 def read_repo_data(repo_owner, repo_name):
-    url = f'https://codeload.github.com/{repo_owner}/{repo_name}/zip/refs/heads/main'
+    url = f"https://codeload.github.com/{repo_owner}/{repo_name}/zip/refs/heads/main"
     resp = requests.get(url)
 
     repository_data = []
@@ -17,7 +17,7 @@ def read_repo_data(repo_owner, repo_name):
     for file_info in zf.infolist():
         filename = file_info.filename.lower()
 
-        if not (filename.endswith('.md') or filename.endswith('.mdx')):
+        if not (filename.endswith(".md") or filename.endswith(".mdx")):
             continue
 
         with zf.open(file_info) as f_in:
@@ -25,8 +25,8 @@ def read_repo_data(repo_owner, repo_name):
             post = frontmatter.loads(content)
             data = post.to_dict()
 
-            _, filename_repo = file_info.filename.split('/', maxsplit=1)
-            data['filename'] = filename_repo
+            _, filename_repo = file_info.filename.split("/", maxsplit=1)
+            data["filename"] = filename_repo
             repository_data.append(data)
 
     zf.close()
@@ -41,8 +41,8 @@ def sliding_window(seq, size, step):
     n = len(seq)
     result = []
     for i in range(0, n, step):
-        batch = seq[i:i+size]
-        result.append({'start': i, 'content': batch})
+        batch = seq[i : i + size]
+        result.append({"start": i, "content": batch})
         if i + size > n:
             break
 
@@ -54,7 +54,7 @@ def chunk_documents(docs, size=2000, step=1000):
 
     for doc in docs:
         doc_copy = doc.copy()
-        doc_content = doc_copy.pop('content')
+        doc_content = doc_copy.pop("content")
         doc_chunks = sliding_window(doc_content, size=size, step=step)
         for chunk in doc_chunks:
             chunk.update(doc_copy)
@@ -64,12 +64,12 @@ def chunk_documents(docs, size=2000, step=1000):
 
 
 def index_data(
-        repo_owner,
-        repo_name,
-        filter=None,
-        chunk=False,
-        chunking_params=None,
-    ):
+    repo_owner,
+    repo_name,
+    filter=None,
+    chunk=False,
+    chunking_params=None,
+):
     docs = read_repo_data(repo_owner, repo_name)
 
     if filter is not None:
@@ -77,7 +77,7 @@ def index_data(
 
     if chunk:
         if chunking_params is None:
-            chunking_params = {'size': 2000, 'step': 1000}
+            chunking_params = {"size": 2000, "step": 1000}
         docs = chunk_documents(docs, **chunking_params)
 
     index = Index(
