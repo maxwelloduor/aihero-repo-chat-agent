@@ -6,53 +6,58 @@ on:
   pull_request:
     branches: [main]
 
-jobs:
-  test:
-    runs-on: ubuntu-latest
+env:
+  # Opt into Node.js 24 to remove deprecation warnings
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
+jobs:
+  test-and-lint:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
-          python-version: "3.10"
+          # Automatically uses the version defined in your pyproject.toml
+          python-version-file: "pyproject.toml"
 
       - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-          pip install pytest pytest-asyncio
-
-      - name: Run tests
-        run: pytest
-
-  lint:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install lint tools
-        run: pip install flake8
+        # uv sync is faster than pip and respects your uv.lock exactly
+        run: uv sync --frozen
 
       - name: Run flake8
-        run: flake8 .
+        run: uv run flake8 .
+
+      - name: Run tests
+        env:
+          # Provide a dummy key so PydanticAI doesn't crash during test initialization
+          OPENAI_API_KEY: "sk-test-key"
+        run: uv run pytest
 
   build:
-    needs: [test, lint]
+    needs: [test-and-lint]
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v4
-
+      - uses: actions/checkout@v5
+      
       - name: Build Docker image
+        # Even if deploying to Streamlit Cloud, building the image 
+        # in CI ensures your Dockerfile isn't broken.
         run: docker build -t faq-assistant .
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
-
+    if: github.ref == 'refs/heads/main'
     steps:
-      - name: Deploy step
-        run: echo "Deploy to Streamlit Cloud / Azure / VM here"
+      - name: Deploy Notification
+        run: |
+          echo "CI Passed! Streamlit Cloud is automatically pulling the new 'main' branch."
+          echo "Check status at: https://share.streamlit.io/"
