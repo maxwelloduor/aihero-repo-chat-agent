@@ -6,30 +6,28 @@ on:
   pull_request:
     branches: [main]
 
-env:
-  # Opt into Node.js 24 to remove deprecation warnings
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
   test-and-lint:
     runs-on: ubuntu-latest
     steps:
+      # Official Node 24 support
       - name: Checkout repo
         uses: actions/checkout@v5
 
       - name: Install uv
+        # Using v5 here is fine; the warning is just a "heads up" 
+        # that it will eventually need an update by September.
         uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
 
+      # Official Node 24 support
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          # Automatically uses the version defined in your pyproject.toml
           python-version-file: "pyproject.toml"
 
       - name: Install dependencies
-        # uv sync is faster than pip and respects your uv.lock exactly
         run: uv sync --frozen
 
       - name: Run flake8
@@ -37,7 +35,6 @@ jobs:
 
       - name: Run tests
         env:
-          # Provide a dummy key so PydanticAI doesn't crash during test initialization
           OPENAI_API_KEY: "sk-test-key"
         run: uv run pytest
 
@@ -48,16 +45,4 @@ jobs:
       - uses: actions/checkout@v5
       
       - name: Build Docker image
-        # Even if deploying to Streamlit Cloud, building the image 
-        # in CI ensures your Dockerfile isn't broken.
         run: docker build -t faq-assistant .
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - name: Deploy Notification
-        run: |
-          echo "CI Passed! Streamlit Cloud is automatically pulling the new 'main' branch."
-          echo "Check status at: https://share.streamlit.io/"
