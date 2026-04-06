@@ -23,6 +23,3 @@ dev = [
 ]
 
 [tool.uv.workspace]
-members = [
-    "app",
-]
