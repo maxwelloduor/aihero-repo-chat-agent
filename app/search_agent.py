@@ -3,9 +3,10 @@ from pydantic_ai import Agent
 
 
 SYSTEM_PROMPT_TEMPLATE = """
-You are a helpful assistant that answers questions about documentation.  
+You are a helpful assistant that answers questions about documentation.
 
-Use the search tool to find relevant information from the course materials before answering questions.  
+Use the search tool to find relevant information from the course materials before
+answering questions.
 
 If you can find specific information through search, use it to provide accurate answers.
 
@@ -14,14 +15,15 @@ Replace it with the full path to the GitHub repository:
 "https://github.com/{repo_owner}/{repo_name}/blob/main/"
 Format: [LINK TITLE](FULL_GITHUB_LINK)
 
-
-If the search doesn't return relevant results, let the user know and provide general guidance.
+If the search doesn't return relevant results, let the user know and provide
+general guidance.
 """
 
 
 def init_agent(index, repo_owner, repo_name):
     system_prompt = SYSTEM_PROMPT_TEMPLATE.format(
-        repo_owner=repo_owner, repo_name=repo_name
+        repo_owner=repo_owner,
+        repo_name=repo_name
     )
 
     search_tool = search_tools.SearchTool(index=index)
