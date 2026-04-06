@@ -6,22 +6,21 @@ on:
   pull_request:
     branches: [main]
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   test-and-lint:
     runs-on: ubuntu-latest
     steps:
-      # Official Node 24 support
       - name: Checkout repo
         uses: actions/checkout@v5
 
       - name: Install uv
-        # Using v5 here is fine; the warning is just a "heads up" 
-        # that it will eventually need an update by September.
-        uses: astral-sh/setup-uv@v5
+        uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
 
-      # Official Node 24 support
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
